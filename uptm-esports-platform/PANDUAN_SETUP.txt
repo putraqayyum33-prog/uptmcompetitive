@@ -1,0 +1,100 @@
+================================================================================
+ PANDUAN CARA SETUP & MENJALANKAN LAMAN WEB UPTM E-SPORTS PLATFORM
+================================================================================
+
+Terima kasih! Ini adalah panduan lengkap langkah-demi-langkah untuk menjalankan 
+sistem laman web UPTM Secure Competitive Gaming Platform di komputer anda.
+
+--------------------------------------------------------------------------------
+1. KEPERLUAN ASAS (PREREQUISITES)
+--------------------------------------------------------------------------------
+- Komputer Windows, macOS, atau Linux.
+- Python 3.10 atau versi terkini (Python 3.11 / 3.12 / 3.13 / 3.14).
+  * Muat turun Python percuma di: https://www.python.org/downloads/
+  * PENTING: Semasa install Python, pastikan anda TANDAKAN (tick) kotak:
+    [✓] "Add python.exe to PATH"
+
+--------------------------------------------------------------------------------
+2. CARA PANTAS (1-KLIK UNTUK PENGGUNA WINDOWS)
+--------------------------------------------------------------------------------
+Langkah 1: Extract (Unzip) semua fail dalam fail ZIP ini ke satu folder.
+Langkah 2: Klik dua kali pada fail "setup.bat" untuk pasang semua library automatik.
+Langkah 3: Klik dua kali pada fail "start.bat" untuk menjalankan laman web.
+Langkah 4: Buka pelayar web (Google Chrome / Microsoft Edge) dan layari:
+           http://127.0.0.1:5000
+
+--------------------------------------------------------------------------------
+3. CARA MANUAL (TERMINAL / CMD / POWERSHELL)
+--------------------------------------------------------------------------------
+Jika anda ingin menjalankan secara manual melalui Command Prompt atau VS Code:
+
+Langkah 1: Buka Command Prompt (CMD) atau PowerShell di dalam folder projek ini.
+           (Tip: Dalam folder projek, klik pada Address Bar di bahagian atas,
+            taip 'cmd' dan tekan Enter).
+
+Langkah 2: (Pilihan Disyorkan) Cipta dan aktifkan persekitaran maya (venv):
+           python -m venv venv
+           venv\Scripts\activate
+
+Langkah 3: Pasang library yang diperlukan:
+           pip install -r requirements.txt
+
+Langkah 4: Jalankan laman web:
+           python run.py
+
+Langkah 5: Buka pelayar web (browser) dan layari pautan:
+           http://127.0.0.1:5000
+
+--------------------------------------------------------------------------------
+4. DATA & AKAUN DEMO (DATABASE)
+--------------------------------------------------------------------------------
+Database SQLite (instance/uptm_esports.db) telah pun siap dibina bersama akaun 
+demo, perlawanan scrim, dan kejohanan.
+
+Anda boleh terus klik butang "1-Click Demo Login" pada laman Login/Navbar, 
+atau gunakan emel & kata laluan berikut:
+
+A) Pentadbir Sistem (Admin):
+   - Emel      : admin@uptm.edu.my
+   - Kata Laluan: Admin@UPTM2026!
+   - Peranan   : Menguruskan kejohanan, peranan pengguna, & log audit keselamatan.
+
+B) Kapten Pasukan 1 (UPTM Titans):
+   - Emel      : captain1@student.uptm.edu.my
+   - Kata Laluan: Student@123
+   - Peranan   : Cipta cabaran scrim, urus ahli pasukan, daftar kejohanan.
+
+C) Kapten Pasukan 2 (Cyber Knights):
+   - Emel      : captain2@student.uptm.edu.my
+   - Kata Laluan: Student@123
+   - Peranan   : Cabar scrim lawan UPTM Titans, rekod skor perlawanan.
+
+D) Pemain Pelajar (Player):
+   - Emel      : player1@student.uptm.edu.my
+   - Kata Laluan: Student@123
+   - Peranan   : Lihat profil MLBB, leaderboard, dan statistik.
+
+* Nota: Jika ingin 'reset' semula database kepada keadaan asal yang bersih:
+  Taip perintah: python seed.py
+
+--------------------------------------------------------------------------------
+5. SELESAIKAN MASALAH LAZIM (TROUBLESHOOTING)
+--------------------------------------------------------------------------------
+Ralat: "'python' is not recognized as an internal or external command"
+Sebab: Python belum dimasukkan ke dalam PATH sistem Windows.
+Solusi: Buka installer Python semula, pilih "Modify", dan tandakan "Add Python to PATH".
+        Atau cuba taip 'py run.py' berbanding 'python run.py'.
+
+Ralat: "No module named 'flask'"
+Solusi: Library belum dipasang. Jalankan: pip install -r requirements.txt
+
+Ralat: Port 5000 telah digunakan
+Solusi: Buka terminal dan tetapkan port lain sebelum run:
+        set PORT=5001
+        python run.py
+        Kemudian layari: http://127.0.0.1:5001
+
+--------------------------------------------------------------------------------
+Selamat mencuba & selamat maju jaya!
+UPTM Secure Competitive Gaming Platform (MLBB Campus League)
+================================================================================

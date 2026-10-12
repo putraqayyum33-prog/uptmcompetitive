@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Tournaments — UPTM Esports{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-2 border-bottom border-secondary border-opacity-10">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <i class="bi bi-trophy text-warning"></i>
+                <h3 class="fw-bold text-white mb-0" style="letter-spacing: -0.02em;">Campus Championships</h3>
+            </div>
+            <p class="text-secondary small mb-0">Official esports tournaments hosted by Universiti Poly-Tech Malaysia E-Sports Club.</p>
+        </div>
+        {% if current_user.is_authenticated and current_user.is_admin %}
+            <a href="{{ url_for('admin.create_tournament') }}" class="btn btn-sm btn-uptm-red">
+                <i class="bi bi-plus-circle me-1"></i> Host Tournament
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Tournaments Grid -->
+    <div class="row g-4">
+        {% for t in tournaments %}
+            <div class="col-lg-6">
+                <div class="card-custom p-4 h-100 hover-glow d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="tag-pill font-mono">{{ t.game_title }}</span>
+                            {% if t.status == 'REGISTRATION_OPEN' %}
+                                <span class="badge bg-success-subtle text-success border border-success border-opacity-25 font-mono px-2.5 py-1" style="font-size: 0.72rem;">REGISTRATION OPEN</span>
+                            {% elif t.status == 'ONGOING' %}
+                                <span class="badge bg-warning-subtle text-warning border border-warning border-opacity-25 font-mono px-2.5 py-1" style="font-size: 0.72rem;">IN PROGRESS</span>
+                            {% else %}
+                                <span class="badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25 font-mono px-2.5 py-1" style="font-size: 0.72rem;">{{ t.status }}</span>
+                            {% endif %}
+                        </div>
+
+                        <h4 class="fw-bold text-white mb-2" style="letter-spacing: -0.01em;">{{ t.title }}</h4>
+                        <p class="text-secondary small mb-3 line-clamp-2">{{ t.description }}</p>
+
+                        <div class="row g-2 mb-4">
+                            <div class="col-6">
+                                <div class="card-inner-box p-2.5">
+                                    <div class="text-secondary font-mono" style="font-size: 0.68rem; letter-spacing: 0.05em;">FORMAT</div>
+                                    <div class="fw-semibold text-white small font-mono">{{ t.format }}</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="card-inner-box p-2.5">
+                                    <div class="text-secondary font-mono" style="font-size: 0.68rem; letter-spacing: 0.05em;">CAPACITY</div>
+                                    <div class="fw-semibold text-info small font-mono">{{ t.approved_registrations|length }} / {{ t.max_teams }} Teams</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="card-inner-box p-2.5">
+                                    <div class="text-secondary font-mono" style="font-size: 0.68rem; letter-spacing: 0.05em;">MIN RANK</div>
+                                    <div class="fw-semibold text-warning small font-mono">{{ t.rank_tier_req }}+</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="card-inner-box p-2.5">
+                                    <div class="text-secondary font-mono" style="font-size: 0.68rem; letter-spacing: 0.05em;">CLOSES</div>
+                                    <div class="fw-semibold text-white small font-mono">{{ t.registration_close | format_date }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="{{ url_for('tournaments.detail', tournament_id=t.id) }}" class="btn btn-uptm-blue w-100 py-2">
+                        View Tournament & Bracket <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12">
+                <div class="card-custom p-5 text-center">
+                    <i class="bi bi-trophy text-secondary fs-2 mb-2 d-block opacity-50"></i>
+                    <h5 class="text-white mb-1">No tournaments currently scheduled</h5>
+                    <p class="text-secondary small mb-0">Check back soon for campus championship announcements and registrations.</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Student Registration — UPTM Esports{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card-custom p-4 p-sm-5">
+
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex p-2.5 rounded-3 mb-3 border border-secondary border-opacity-25" style="background-color: var(--bg-card-inner);">
+                        <img src="{{ url_for('static', filename='img/uptm-icon.png') }}" alt="UPTM" width="36" height="36">
+                    </div>
+                    <h4 class="fw-bold text-white mb-1">Create Student Account</h4>
+                    <p class="text-secondary small">Universiti Poly-Tech Malaysia &middot; Competitive Gaming Hub</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('auth.register') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <!-- Account Info Section -->
+                    <div class="p-3.5 rounded-3 mb-4 card-inner-box">
+                        <div class="eyebrow-label mb-3 text-primary">Student Credentials</div>
+
+                        <div class="mb-3">
+                            <label class="form-label small text-secondary">Institutional Email <span class="text-danger">*</span></label>
+                            <input type="email" name="email" class="form-control form-control-custom" placeholder="e.g. yourname@student.uptm.edu.my" required>
+                            <div class="form-text text-secondary font-mono" style="font-size: 0.72rem;">Restricted to @student.uptm.edu.my domains.</div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small text-secondary">Full Display Name <span class="text-danger">*</span></label>
+                                <input type="text" name="display_name" class="form-control form-control-custom" placeholder="e.g. Ahmad Faiz" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-secondary">Student ID (Optional)</label>
+                                <input type="text" name="student_id" class="form-control form-control-custom font-mono" placeholder="e.g. SW01081234">
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small text-secondary">Password <span class="text-danger">*</span></label>
+                                <input type="password" name="password" class="form-control form-control-custom" placeholder="Min. 6 characters" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-secondary">Confirm Password <span class="text-danger">*</span></label>
+                                <input type="password" name="confirm_password" class="form-control form-control-custom" placeholder="Re-enter password" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MLBB Profile Section -->
+                    <div class="p-3.5 rounded-3 mb-4 card-inner-box">
+                        <div class="eyebrow-label mb-3 text-primary">Mobile Legends Profile</div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small text-secondary">In-Game Name (IGN) <span class="text-danger">*</span></label>
+                                <input type="text" name="mlbb_ign" class="form-control form-control-custom font-mono" placeholder="e.g. Faiz_Carry" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-secondary">MLBB Player ID <span class="text-danger">*</span></label>
+                                <input type="text" name="mlbb_id" class="form-control form-control-custom font-mono" placeholder="e.g. 123456789" required>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small text-secondary">Rank Division <span class="text-danger">*</span></label>
+                                <select name="rank_tier" class="form-select form-select-custom" required>
+                                    <option value="WARRIOR">Warrior</option>
+                                    <option value="ELITE">Elite</option>
+                                    <option value="MASTER">Master</option>
+                                    <option value="GRANDMASTER">Grandmaster</option>
+                                    <option value="EPIC" selected>Epic</option>
+                                    <option value="LEGEND">Legend</option>
+                                    <option value="MYTHIC">Mythic</option>
+                                    <option value="MYTHICAL_HONOR">Mythical Honor</option>
+                                    <option value="MYTHICAL_GLORY">Mythical Glory</option>
+                                    <option value="MYTHICAL_IMMORTAL">Mythical Immortal</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-secondary">Phone Number (Optional)</label>
+                                <input type="tel" name="phone" class="form-control form-control-custom font-mono" placeholder="e.g. +60112345678">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security & Privacy Notice -->
+                    <div class="p-3 rounded-3 mb-4 card-inner-box d-flex gap-2.5 align-items-center" style="font-size: 0.75rem;">
+                        <i class="bi bi-shield-check text-success fs-5"></i>
+                        <span class="text-secondary">
+                            Student ID and phone number are encrypted at rest with AES-256-GCM. Information is strictly utilized for campus tournament verification.
+                        </span>
+                    </div>
+
+                    <button type="submit" class="btn btn-uptm-blue w-100 py-2.5">
+                        Complete Registration
+                    </button>
+                </form>
+
+                <div class="text-center mt-3 small">
+                    <span class="text-secondary">Already registered?</span>
+                    <a href="{{ url_for('auth.login') }}" class="text-info text-decoration-none ms-1">Sign In</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

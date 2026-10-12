@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Publish Campus Tournament — Admin Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card-custom p-4 p-sm-5">
+
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-15">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <i class="bi bi-trophy text-warning"></i>
+                            <h3 class="h4 fw-bold text-white mb-0" style="letter-spacing: -0.02em;">Host Campus Championship</h3>
+                        </div>
+                        <p class="text-secondary small mb-0">Publish an official collegiate tournament with automated bracket seeding.</p>
+                    </div>
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-sm btn-outline-custom">Cancel</a>
+                </div>
+
+                <form method="POST" action="{{ url_for('admin.create_tournament') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Tournament Title <span class="text-danger">*</span></label>
+                        <input type="text" name="title" class="form-control form-control-custom" placeholder="e.g. UPTM MLBB Inter-Faculty Championship 2026" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Tournament Description</label>
+                        <textarea name="description" rows="2" class="form-control form-control-custom" placeholder="Overview, prize pool details, faculty eligibility..."></textarea>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small text-secondary">Game Title</label>
+                            <input type="text" name="game_title" class="form-control form-control-custom" value="Mobile Legends: Bang Bang" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-secondary">Tournament Format</label>
+                            <select name="format" class="form-select form-select-custom">
+                                <option value="SINGLE_ELIMINATION" selected>Single Elimination</option>
+                                <option value="DOUBLE_ELIMINATION">Double Elimination</option>
+                                <option value="ROUND_ROBIN">Round Robin</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small text-secondary">Team Capacity</label>
+                            <select name="max_teams" class="form-select form-select-custom font-mono">
+                                <option value="8">8 Teams</option>
+                                <option value="16" selected>16 Teams</option>
+                                <option value="32">32 Teams</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-secondary">Minimum Rank Requirement</label>
+                            <select name="rank_tier_req" class="form-select form-select-custom">
+                                <option value="EPIC" selected>Epic and above</option>
+                                <option value="LEGEND">Legend and above</option>
+                                <option value="MYTHIC">Mythic only</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small text-secondary">Registration Opens</label>
+                            <input type="datetime-local" name="registration_open" class="form-control form-control-custom font-mono">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-secondary">Registration Closes</label>
+                            <input type="datetime-local" name="registration_close" class="form-control form-control-custom font-mono">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small text-secondary">Rules & Regulations</label>
+                        <textarea name="rules" rows="4" class="form-control form-control-custom font-mono" style="font-size: 0.82rem;" placeholder="Standard MLBB 5v5 custom draft pick regulations..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-uptm-red w-100 py-2.5">
+                        <i class="bi bi-megaphone me-1"></i> Publish Tournament
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

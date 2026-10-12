@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}{{ team.name }} [{{ team.tag }}] — UPTM Esports{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Team Hero Card -->
+    <div class="card-custom p-4 p-md-5 mb-4 position-relative overflow-hidden">
+        <div class="row align-items-center g-4">
+            <div class="col-auto">
+                <img src="{{ team.logo_url or 'https://api.dicebear.com/7.x/identicon/svg?seed=' ~ team.tag }}" alt="{{ team.name }}" width="88" height="88" class="rounded-4 border border-secondary border-opacity-25 bg-dark">
+            </div>
+            <div class="col">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    <h2 class="h3 fw-bold text-white mb-0" style="letter-spacing: -0.02em;">{{ team.name }}</h2>
+                    <span class="tag-pill font-mono">[{{ team.tag }}]</span>
+                    {% if team.status == 'ACTIVE' %}
+                        <span class="badge bg-success-subtle text-success border border-success border-opacity-25 px-2.5 py-1">Active Roster</span>
+                    {% else %}
+                        <span class="badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25 px-2.5 py-1">{{ team.status }}</span>
+                    {% endif %}
+                </div>
+                <p class="text-secondary small mb-3" style="max-width: 650px;">{{ team.description or 'Official campus gaming roster of Universiti Poly-Tech Malaysia.' }}</p>
+                <div class="d-flex flex-wrap gap-3 gap-md-4 text-secondary small">
+                    <div class="d-flex align-items-center gap-1.5">
+                        <i class="bi bi-person-fill text-warning"></i>
+                        <span>Captain: <strong class="text-white">{{ team.captain.display_name }}</strong></span>
+                    </div>
+                    <div class="d-flex align-items-center gap-1.5">
+                        <i class="bi bi-people-fill text-primary"></i>
+                        <span><strong class="text-white font-mono">{{ members|length }}</strong> Members</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-1.5">
+                        <i class="bi bi-graph-up text-success"></i>
+                        <span>Record: <strong class="text-white font-mono">{{ team.scrim_wins }}W - {{ team.total_scrims_played - team.scrim_wins }}L</strong> (<span class="font-mono text-info">{{ team.win_rate }}%</span>)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-auto d-flex flex-wrap gap-2">
+                {% if is_captain %}
+                    <span class="badge bg-primary-subtle text-primary border border-primary border-opacity-25 py-2 px-3 small font-mono">
+                        <i class="bi bi-shield-check me-1"></i> CAPTAIN
+                    </span>
+                {% elif is_member %}
+                    <form method="POST" action="{{ url_for('teams.leave_team', team_id=team.id) }}" onsubmit="return confirm('Are you sure you want to leave this team?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Leave Team</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Left: Roster List -->
+        <div class="col-lg-7">
+            <div class="card-custom p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-people text-primary"></i> Active Lineup
+                    </h5>
+                    <span class="badge bg-dark border border-secondary border-opacity-25 text-secondary font-mono small">{{ members|length }} / 5+</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-custom mb-0">
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>MLBB ID</th>
+                                <th>Tier</th>
+                                <th>Role</th>
+                                {% if is_captain %}<th>Action</th>{% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for m in members %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2.5">
+                                            <img src="{{ m.user.avatar_url or 'https://api.dicebear.com/7.x/bottts/svg?seed=' ~ m.user.email }}" alt="" width="30" height="30" class="rounded-circle border border-secondary border-opacity-25">
+                                            <div>
+                                                <div class="fw-semibold text-white small">{{ m.user.display_name }}</div>
+                                                <div class="text-secondary font-mono" style="font-size: 0.7rem;">{{ m.user.email }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="text-white small fw-medium font-mono">{{ m.user.mlbb_ign or '—' }}</div>
+                                        <div class="text-secondary font-mono" style="font-size: 0.7rem;">{{ m.user.mlbb_id or '—' }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge {{ m.user.rank_tier | rank_badge_class }}">{{ m.user.rank_tier }}</span>
+                                    </td>
+                                    <td>
+                                        {% if m.role == 'CAPTAIN' or m.user_id == team.captain_id %}
+                                            <span class="badge bg-warning-subtle text-warning border border-warning border-opacity-25 font-mono" style="font-size: 0.72rem;">Captain</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25 font-mono" style="font-size: 0.72rem;">{{ m.role }}</span>
+                                        {% endif %}
+                                    </td>
+                                    {% if is_captain %}
+                                        <td>
+                                            {% if m.user_id != team.captain_id %}
+                                                <form method="POST" action="{{ url_for('teams.remove_member', team_id=team.id, member_id=m.id) }}" class="d-inline" onsubmit="return confirm('Remove this player from the roster?');">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2 font-mono" style="font-size: 0.72rem;">Kick</button>
+                                                </form>
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Captain Invite Form -->
+                {% if is_captain %}
+                    <div class="mt-4 pt-3 border-top border-secondary border-opacity-15">
+                        <div class="card-inner-box p-3">
+                            <h6 class="fw-bold text-white mb-2 small d-flex align-items-center gap-1.5">
+                                <i class="bi bi-person-plus text-success"></i> Add Player to Roster
+                            </h6>
+                            <form method="POST" action="{{ url_for('teams.invite_member', team_id=team.id) }}" class="d-flex gap-2">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="text" name="identifier" class="form-control form-control-custom form-control-sm" placeholder="Student email or MLBB IGN..." required>
+                                <button type="submit" class="btn btn-sm btn-uptm-blue text-nowrap">Add Player</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right: Recent Matches -->
+        <div class="col-lg-5">
+            <div class="card-custom p-4">
+                <h5 class="fw-bold text-white mb-3 d-flex align-items-center gap-2">
+                    <i class="bi bi-clock-history text-secondary"></i> Match Record
+                </h5>
+                {% if matches %}
+                    <div class="d-flex flex-column gap-2.5">
+                        {% for match in matches %}
+                            <div class="card-inner-box p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-secondary font-mono" style="font-size: 0.72rem;">{{ match.scheduled_at | format_datetime }}</span>
+                                    {% if match.status == 'COMPLETED' %}
+                                        {% if match.winner_id == team.id %}
+                                            <span class="badge bg-success-subtle text-success border border-success border-opacity-25 font-mono" style="font-size: 0.7rem;">VICTORY</span>
+                                        {% else %}
+                                            <span class="badge bg-danger-subtle text-danger border border-danger border-opacity-25 font-mono" style="font-size: 0.7rem;">DEFEAT</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge bg-warning-subtle text-warning border border-warning border-opacity-25 font-mono" style="font-size: 0.7rem;">{{ match.status }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="small fw-semibold {% if match.team1_id == team.id %}text-info{% else %}text-white{% endif %} text-truncate" style="max-width: 140px;">
+                                        {{ match.team1.name }}
+                                    </div>
+                                    <div class="font-mono fw-bold fs-6 px-2 text-white">
+                                        {{ match.team1_score }} - {{ match.team2_score }}
+                                    </div>
+                                    <div class="small fw-semibold {% if match.team2_id == team.id %}text-info{% else %}text-white{% endif %} text-truncate text-end" style="max-width: 140px;">
+                                        {{ match.team2.name }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="card-inner-box p-4 text-center">
+                        <p class="text-secondary small mb-0">No matches recorded for this roster yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Register New Team — UPTM Esports{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card-custom p-4 p-sm-5">
+
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-3 p-3 mb-3 border border-secondary border-opacity-25" style="background: rgba(255, 255, 255, 0.03);">
+                        <i class="bi bi-shield-plus fs-3 text-primary"></i>
+                    </div>
+                    <h3 class="fw-bold text-white mb-1" style="letter-spacing: -0.02em;">Create Esports Roster</h3>
+                    <p class="text-secondary small mb-0">Register your collegiate squad for scrims and campus tournaments</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('teams.create') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Team Name <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control form-control-custom" placeholder="e.g. UPTM Titans" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Team Tag / Moniker <span class="text-danger">*</span></label>
+                        <input type="text" name="tag" class="form-control form-control-custom font-mono" placeholder="e.g. UTT" maxlength="6" style="text-transform: uppercase;" required>
+                        <div class="form-text text-secondary" style="font-size: 0.72rem;">Maximum 6 characters. Displayed in brackets on matches and standings.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Logo URL (Optional)</label>
+                        <input type="url" name="logo_url" class="form-control form-control-custom" placeholder="https://... (Identicon auto-generated if left blank)">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small text-secondary">Team Bio / Description</label>
+                        <textarea name="description" rows="3" class="form-control form-control-custom" placeholder="Brief background about your squad, campus division, or accomplishments..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-uptm-blue w-100 py-2.5">
+                        <i class="bi bi-shield-check me-1"></i> Register Roster & Become Captain
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Post Scrim Challenge — UPTM Esports{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card-custom p-4 p-sm-5">
+
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex p-2.5 rounded-3 mb-3 border border-secondary border-opacity-25" style="background-color: var(--bg-card-inner);">
+                        <i class="bi bi-controller fs-3 text-primary"></i>
+                    </div>
+                    <h4 class="fw-bold text-white mb-1">Post Scrim Request</h4>
+                    <p class="text-secondary small">Broadcast a competitive challenge to other campus rosters</p>
+                </div>
+
+                <!-- Active Team Info -->
+                <div class="p-3 rounded-3 mb-4 card-inner-box d-flex align-items-center gap-3">
+                    <img src="{{ my_team.logo_url or 'https://api.dicebear.com/7.x/identicon/svg?seed=' ~ my_team.tag }}" alt="" width="40" height="40" class="rounded">
+                    <div>
+                        <div class="eyebrow-label" style="font-size: 0.65rem;">POSTING AS</div>
+                        <div class="fw-bold text-white">{{ my_team.name }} <span class="tag-pill">[{{ my_team.tag }}]</span></div>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ url_for('scrims.create') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Match Format <span class="text-danger">*</span></label>
+                        <select name="format" class="form-select form-select-custom font-mono">
+                            <option value="BO1">Best of 1 (BO1)</option>
+                            <option value="BO3" selected>Best of 3 (BO3) — Standard</option>
+                            <option value="BO5">Best of 5 (BO5) — Finals Practice</option>
+                        </select>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small text-secondary">Minimum Rank Tier</label>
+                            <select name="rank_tier_min" class="form-select form-select-custom font-mono">
+                                <option value="EPIC" selected>Epic</option>
+                                <option value="LEGEND">Legend</option>
+                                <option value="MYTHIC">Mythic</option>
+                                <option value="MYTHICAL_GLORY">Mythical Glory</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-secondary">Maximum Rank Tier</label>
+                            <select name="rank_tier_max" class="form-select form-select-custom font-mono">
+                                <option value="LEGEND">Legend</option>
+                                <option value="MYTHIC" selected>Mythic</option>
+                                <option value="MYTHICAL_GLORY">Mythical Glory</option>
+                                <option value="MYTHICAL_IMMORTAL">Mythical Immortal</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Preferred Match Time <span class="text-danger">*</span></label>
+                        <input type="datetime-local" name="preferred_datetime" class="form-control form-control-custom font-mono" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small text-secondary">Notes (Optional)</label>
+                        <textarea name="notes" rows="2" class="form-control form-control-custom" placeholder="e.g. Draft pick practice, friendly faculty scrim"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-uptm-blue w-100 py-2.5">
+                        Broadcast Scrim to Lobby
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

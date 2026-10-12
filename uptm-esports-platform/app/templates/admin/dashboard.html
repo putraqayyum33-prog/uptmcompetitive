@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard — UPTM Esports{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Admin Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-2 border-bottom border-secondary border-opacity-10">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-danger-subtle text-danger border border-danger border-opacity-25 font-mono" style="font-size: 0.68rem; letter-spacing: 0.05em;">ADMIN CONSOLE</span>
+                <h3 class="fw-bold text-white mb-0" style="letter-spacing: -0.02em;">System Control Center</h3>
+            </div>
+            <p class="text-secondary small mb-0">Platform oversight, student moderation, tournament publication, and cryptographic audit logging.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ url_for('admin.users') }}" class="btn btn-sm btn-outline-custom">
+                <i class="bi bi-people me-1"></i> Manage Users
+            </a>
+            <a href="{{ url_for('admin.create_tournament') }}" class="btn btn-sm btn-uptm-red">
+                <i class="bi bi-plus-circle me-1"></i> Host Tournament
+            </a>
+            <a href="{{ url_for('admin.audit_logs') }}" class="btn btn-sm btn-outline-custom">
+                <i class="bi bi-shield-check me-1"></i> Audit Trail
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card-custom p-3.5 text-center">
+                <div class="text-secondary font-mono small mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">REGISTERED USERS</div>
+                <h2 class="fw-bold text-white font-mono mb-0" style="letter-spacing: -0.02em;">{{ stats.users }}</h2>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card-custom p-3.5 text-center">
+                <div class="text-secondary font-mono small mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">ACTIVE ROSTERS</div>
+                <h2 class="fw-bold text-primary font-mono mb-0" style="letter-spacing: -0.02em;">{{ stats.teams }}</h2>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card-custom p-3.5 text-center">
+                <div class="text-secondary font-mono small mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">SCRIM MATCHES</div>
+                <h2 class="fw-bold text-danger font-mono mb-0" style="letter-spacing: -0.02em;">{{ stats.scrims }}</h2>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card-custom p-3.5 text-center">
+                <div class="text-secondary font-mono small mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">TOURNAMENTS</div>
+                <h2 class="fw-bold text-warning font-mono mb-0" style="letter-spacing: -0.02em;">{{ stats.tournaments }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Recent Users -->
+        <div class="col-lg-6">
+            <div class="card-custom p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-people text-info"></i> Recent Registrations
+                    </h5>
+                    <a href="{{ url_for('admin.users') }}" class="small text-info text-decoration-none font-mono" style="font-size: 0.75rem;">View All <i class="bi bi-arrow-right"></i></a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-custom mb-0">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in recent_users %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold text-white small">{{ u.display_name }}</div>
+                                        <div class="text-secondary font-mono" style="font-size: 0.7rem;">{{ u.email }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if u.role == 'ADMIN' %}bg-danger-subtle text-danger border border-danger border-opacity-25{% elif u.role == 'CAPTAIN' %}bg-primary-subtle text-primary border border-primary border-opacity-25{% else %}bg-secondary-subtle text-secondary border border-secondary border-opacity-25{% endif %} font-mono" style="font-size: 0.7rem;">
+                                            {{ u.role }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if u.status == 'ACTIVE' %}bg-success-subtle text-success border border-success border-opacity-25{% else %}bg-danger-subtle text-danger border border-danger border-opacity-25{% endif %} font-mono" style="font-size: 0.7rem;">
+                                            {{ u.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Audit Trail -->
+        <div class="col-lg-6">
+            <div class="card-custom p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-shield-check text-success"></i> Audit Chain Events
+                    </h5>
+                    <a href="{{ url_for('admin.audit_logs') }}" class="small text-info text-decoration-none font-mono" style="font-size: 0.75rem;">Full Log <i class="bi bi-arrow-right"></i></a>
+                </div>
+
+                <div class="d-flex flex-column gap-2">
+                    {% for a in recent_audits %}
+                        <div class="card-inner-box p-2.5">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-dark border border-secondary border-opacity-25 text-info font-mono" style="font-size: 0.68rem;">
+                                    {{ a.action }}
+                                </span>
+                                <span class="text-secondary font-mono" style="font-size: 0.7rem;">{{ a.created_at | format_datetime }}</span>
+                            </div>
+                            <div class="text-white small mt-1.5" style="font-size: 0.8rem;">
+                                {{ a.details or (a.target_type ~ ' #' ~ a.target_id) }}
+                            </div>
+                            <div class="font-mono text-secondary mt-1 text-truncate" style="font-size: 0.65rem;">
+                                SHA-256: <span class="text-success opacity-75">{{ a.hash }}</span>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="card-inner-box p-3 text-center">
+                            <p class="text-secondary small mb-0">No audit events recorded.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — UPTM Esports{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Gamer Profile Banner -->
+    <div class="card-custom p-4 mb-4">
+        <div class="row align-items-center g-3">
+            <div class="col-auto">
+                <img src="{{ current_user.avatar_url or 'https://api.dicebear.com/7.x/bottts/svg?seed=' ~ current_user.email }}" alt="Avatar" width="64" height="64" class="rounded-3 border border-secondary border-opacity-25">
+            </div>
+            <div class="col">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                    <h4 class="fw-bold text-white mb-0">{{ current_user.display_name }}</h4>
+                    <span class="badge-rank {{ current_user.rank_tier | rank_badge_class }}">{{ current_user.rank_tier }}</span>
+                    {% if current_user.is_admin %}
+                        <span class="badge bg-danger bg-opacity-20 text-danger border border-danger border-opacity-25" style="font-size: 0.7rem; font-family: var(--font-mono);">ADMIN</span>
+                    {% elif current_user.is_captain %}
+                        <span class="badge bg-primary bg-opacity-20 text-primary border border-primary border-opacity-25" style="font-size: 0.7rem; font-family: var(--font-mono);">CAPTAIN</span>
+                    {% else %}
+                        <span class="badge bg-secondary bg-opacity-20 text-secondary border border-secondary border-opacity-25" style="font-size: 0.7rem; font-family: var(--font-mono);">PLAYER</span>
+                    {% endif %}
+                </div>
+                <div class="text-secondary small d-flex flex-wrap gap-3 font-mono" style="font-size: 0.78rem;">
+                    <span>IGN: <strong class="text-white">{{ current_user.mlbb_ign or 'Not set' }}</strong></span>
+                    <span>ID: <strong class="text-white">{{ current_user.mlbb_id or '—' }}</strong></span>
+                    <span>{{ current_user.email }}</span>
+                </div>
+            </div>
+            <div class="col-md-auto d-flex gap-2">
+                <a href="{{ url_for('profile.index') }}" class="btn btn-sm btn-outline-custom">
+                    <i class="bi bi-pencil-square me-1"></i> Edit Profile
+                </a>
+                {% if not my_team %}
+                    <a href="{{ url_for('teams.create') }}" class="btn btn-sm btn-uptm-blue">
+                        <i class="bi bi-plus-lg me-1"></i> Create Team
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Left Column: Team & Matches -->
+        <div class="col-lg-8">
+
+            <!-- Team Status Card -->
+            <div class="card-custom p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="eyebrow-label text-primary">SQUAD</span>
+                        <h5 class="fw-bold text-white mb-0">My Roster</h5>
+                    </div>
+                    {% if my_team %}
+                        <a href="{{ url_for('teams.detail', team_id=my_team.id) }}" class="btn btn-sm btn-outline-custom" style="font-size: 0.78rem;">Roster Profile</a>
+                    {% endif %}
+                </div>
+
+                {% if my_team %}
+                    <div class="p-3 rounded-3 card-inner-box d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="{{ my_team.logo_url or 'https://api.dicebear.com/7.x/identicon/svg?seed=' ~ my_team.tag }}" alt="Logo" width="44" height="44" class="rounded">
+                            <div>
+                                <h6 class="fw-bold text-white mb-0">{{ my_team.name }} <span class="tag-pill">[{{ my_team.tag }}]</span></h6>
+                                <span class="text-secondary small font-mono" style="font-size: 0.75rem;">Captain: {{ my_team.captain.display_name }} &middot; {{ my_team.active_members|length }} Members</span>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <span class="tag-pill font-mono" style="font-size: 0.78rem;">
+                                {{ my_team.scrim_wins }}W / {{ my_team.total_scrims_played }}M ({{ my_team.win_rate }}% WR)
+                            </span>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="p-4 text-center border border-dashed border-secondary border-opacity-25 rounded-3 text-secondary">
+                        <i class="bi bi-people fs-3 text-secondary mb-2 d-block"></i>
+                        <p class="small mb-3">You are not currently part of any esports team.</p>
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="{{ url_for('teams.create') }}" class="btn btn-sm btn-uptm-blue">Create Roster</a>
+                            <a href="{{ url_for('teams.index') }}" class="btn btn-sm btn-outline-custom">Browse Teams</a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Upcoming Scheduled Scrims -->
+            <div class="card-custom p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="eyebrow-label text-danger">FIXTURES</span>
+                        <h5 class="fw-bold text-white mb-0">Upcoming Scrims</h5>
+                    </div>
+                    <a href="{{ url_for('scrims.create') }}" class="btn btn-sm btn-uptm-blue" style="font-size: 0.78rem;">
+                        <i class="bi bi-plus-lg me-1"></i> Post Scrim
+                    </a>
+                </div>
+
+                {% if upcoming_scrims %}
+                    <div class="d-flex flex-column gap-2.5">
+                        {% for match in upcoming_scrims %}
+                            <div class="p-3 rounded-3 card-inner-box d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="badge bg-warning bg-opacity-15 text-warning border border-warning border-opacity-25 font-mono" style="font-size: 0.72rem;">{{ match.scheduled_at | format_datetime }}</span>
+                                    <div>
+                                        <span class="fw-semibold text-white">{{ match.team1.name }}</span>
+                                        <span class="text-danger fw-bold font-mono mx-1.5" style="font-size: 0.75rem;">VS</span>
+                                        <span class="fw-semibold text-white">{{ match.team2.name }}</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="font-mono text-secondary small" style="font-size: 0.75rem;">Room: <strong class="text-white">{{ match.match_room_id }}</strong></span>
+                                    <a href="{{ url_for('scrims.match_detail', match_id=match.id) }}" class="btn btn-sm btn-outline-custom" style="font-size: 0.78rem;">
+                                        Enter Room <i class="bi bi-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="p-4 text-center border border-dashed border-secondary border-opacity-25 rounded-3 text-secondary">
+                        <p class="small mb-0">No upcoming matches scheduled. Browse challenges or create one below.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Open Scrim Challenges in Lobby -->
+            <div class="card-custom p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="eyebrow-label text-warning">LOBBY</span>
+                        <h5 class="fw-bold text-white mb-0">Live Challenges</h5>
+                    </div>
+                    <a href="{{ url_for('scrims.index') }}" class="small text-info text-decoration-none font-mono" style="font-size: 0.75rem;">All Challenges &rarr;</a>
+                </div>
+
+                {% if open_scrims %}
+                    <div class="d-flex flex-column gap-2.5">
+                        {% for req in open_scrims %}
+                            <div class="p-3 rounded-3 card-inner-box d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <span class="fw-semibold text-white">{{ req.team.name }}</span>
+                                        <span class="tag-pill">[{{ req.team.tag }}]</span>
+                                        <span class="badge bg-secondary bg-opacity-20 text-secondary border border-secondary border-opacity-25 font-mono" style="font-size: 0.68rem;">{{ req.format }}</span>
+                                        <span class="badge bg-primary bg-opacity-15 text-primary border border-primary border-opacity-25 font-mono" style="font-size: 0.68rem;">{{ req.rank_tier_min }} - {{ req.rank_tier_max }}</span>
+                                    </div>
+                                    <div class="text-secondary small font-mono" style="font-size: 0.72rem;">
+                                        <i class="bi bi-clock me-1"></i> Preferred: {{ req.preferred_datetime | format_datetime }}
+                                        {% if req.notes %} &middot; <span class="text-light">"{{ req.notes }}"</span>{% endif %}
+                                    </div>
+                                </div>
+                                <div>
+                                    {% if my_team and my_team.id != req.team_id %}
+                                        <form method="POST" action="{{ url_for('scrims.accept', request_id=req.id) }}" class="d-inline">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-sm btn-uptm-red" style="font-size: 0.78rem;">
+                                                Accept Challenge
+                                            </button>
+                                        </form>
+                                    {% elif not my_team %}
+                                        <span class="text-secondary small font-mono" style="font-size: 0.72rem;">Join roster to accept</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="p-3 text-center text-secondary small">
+                        No open challenges currently posted.
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- Right Column: Tournaments & Notifications -->
+        <div class="col-lg-4">
+
+            <!-- Active Tournaments -->
+            <div class="card-custom p-4 mb-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="fw-bold text-white mb-0">Tournaments</h5>
+                    <span class="eyebrow-label text-warning">CAMPUS</span>
+                </div>
+                {% if active_tournaments %}
+                    <div class="d-flex flex-column gap-2.5">
+                        {% for t in active_tournaments %}
+                            <div class="p-3 rounded-3 card-inner-box">
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <h6 class="fw-semibold text-white mb-0" style="font-size: 0.88rem;">{{ t.title }}</h6>
+                                    <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-25 font-mono" style="font-size: 0.65rem;">{{ t.status }}</span>
+                                </div>
+                                <div class="text-secondary small mb-2 font-mono" style="font-size: 0.72rem;">
+                                    {{ t.format }} &middot; {{ t.max_teams }} Teams max<br>
+                                    Closes: {{ t.registration_close | format_date }}
+                                </div>
+                                <a href="{{ url_for('tournaments.detail', tournament_id=t.id) }}" class="btn btn-sm btn-outline-custom w-100" style="font-size: 0.78rem;">
+                                    View Tournament
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-secondary small mb-0">No active tournaments right now.</p>
+                {% endif %}
+            </div>
+
+            <!-- Notifications Feed -->
+            <div class="card-custom p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-white mb-0">Notifications</h5>
+                    {% if notifications %}
+                        <form method="POST" action="{{ url_for('main.mark_all_notifications_read') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-link text-secondary p-0 small text-decoration-none font-mono" style="font-size: 0.72rem;">
+                                Mark all read
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+
+                {% if notifications %}
+                    <div class="d-flex flex-column gap-2">
+                        {% for n in notifications %}
+                            <div class="p-2.5 rounded-2 card-inner-box {% if not n.is_read %}border-primary border-opacity-40{% endif %}">
+                                <div class="fw-semibold text-white small mb-0.5">{{ n.title }}</div>
+                                <div class="text-secondary small" style="font-size: 0.75rem;">{{ n.message }}</div>
+                                <div class="d-flex justify-content-between align-items-center mt-1">
+                                    <span class="text-muted font-mono" style="font-size: 0.65rem;">{{ n.created_at | format_datetime }}</span>
+                                    {% if n.link %}
+                                        <a href="{{ n.link }}" class="text-info small text-decoration-none font-mono" style="font-size: 0.7rem;">View</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-secondary small mb-0">No notifications yet.</p>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

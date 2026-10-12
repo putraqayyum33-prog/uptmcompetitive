@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Esports Rosters & Teams — UPTM Esports{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <div class="eyebrow-label text-primary mb-1">CAMPUS SQUADS</div>
+            <h3 class="fw-bold text-white mb-1">UPTM Rosters</h3>
+            <p class="text-secondary small mb-0">Browse student teams, faculty squads, and competitive rosters.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <form method="GET" action="{{ url_for('teams.index') }}" class="d-flex gap-2">
+                <input type="text" name="q" value="{{ search }}" class="form-control form-control-custom form-control-sm font-mono" placeholder="Search team or tag..." style="font-size: 0.78rem;">
+                <button type="submit" class="btn btn-sm btn-outline-custom"><i class="bi bi-search"></i></button>
+            </form>
+            <a href="{{ url_for('teams.create') }}" class="btn btn-sm btn-uptm-blue text-nowrap">
+                <i class="bi bi-plus-lg me-1"></i> Register Team
+            </a>
+        </div>
+    </div>
+
+    <!-- Teams Grid -->
+    <div class="row g-4">
+        {% for team in teams %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card-custom p-4 h-100 hover-glow d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <img src="{{ team.logo_url or 'https://api.dicebear.com/7.x/identicon/svg?seed=' ~ team.tag }}" alt="{{ team.name }}" width="48" height="48" class="rounded-3 border border-secondary border-opacity-25">
+                            <div>
+                                <h5 class="fw-bold text-white mb-0.5">{{ team.name }}</h5>
+                                <span class="tag-pill">[{{ team.tag }}]</span>
+                            </div>
+                        </div>
+
+                        <p class="text-secondary small mb-3" style="min-height: 38px; line-height: 1.5; font-size: 0.82rem;">
+                            {{ team.description or 'Official competitive squad of Universiti Poly-Tech Malaysia.' }}
+                        </p>
+
+                        <div class="p-2.5 rounded-3 card-inner-box mb-3 font-mono" style="font-size: 0.75rem;">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-secondary">Captain:</span>
+                                <span class="text-white">{{ team.captain.display_name }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-secondary">Roster:</span>
+                                <span class="text-info">{{ team.active_members|length }} Players</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-secondary">Record:</span>
+                                <span class="text-success fw-semibold">{{ team.win_rate }}% ({{ team.scrim_wins }}W / {{ team.total_scrims_played }}M)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="{{ url_for('teams.detail', team_id=team.id) }}" class="btn btn-sm btn-outline-custom w-100" style="font-size: 0.78rem;">
+                        View Team Roster <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-people text-secondary fs-2 mb-2 d-block opacity-50"></i>
+                <h5 class="text-white">No teams found</h5>
+                <p class="text-secondary small">Be the first to create a roster for upcoming tournaments.</p>
+                <a href="{{ url_for('teams.create') }}" class="btn btn-uptm-blue">Create a Team</a>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Match Room: {{ match.team1.tag }} vs {{ match.team2.tag }} — UPTM Esports{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{{ url_for('scrims.index') }}" class="btn btn-sm btn-outline-custom">
+            <i class="bi bi-arrow-left me-1"></i> Scrim Lobby
+        </a>
+        <div>
+            {% if match.status == 'COMPLETED' %}
+                <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-25 py-1.5 px-3 font-mono" style="font-size: 0.75rem;">MATCH COMPLETED</span>
+            {% else %}
+                <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-25 py-1.5 px-3 font-mono" style="font-size: 0.75rem;">{{ match.status }}</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Match Header Card -->
+    <div class="card-custom p-4 p-md-5 mb-4 text-center">
+        <div class="text-secondary small mb-4 font-mono" style="font-size: 0.78rem;">
+            <i class="bi bi-calendar-event me-1"></i> Scheduled: {{ match.scheduled_at | format_datetime }}
+        </div>
+
+        <div class="row align-items-center justify-content-center g-4">
+            <!-- Team 1 -->
+            <div class="col-5 col-md-4 text-end">
+                <img src="{{ match.team1.logo_url or 'https://api.dicebear.com/7.x/identicon/svg?seed=' ~ match.team1.tag }}" alt="" width="68" height="68" class="rounded-3 border border-secondary border-opacity-25 mb-2">
+                <h4 class="fw-bold text-white mb-1">{{ match.team1.name }}</h4>
+                <span class="tag-pill">[{{ match.team1.tag }}]</span>
+                {% if match.status == 'COMPLETED' and match.winner_id == match.team1.id %}
+                    <div class="mt-2"><span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-25 font-mono" style="font-size: 0.72rem;"><i class="bi bi-check-circle me-1"></i> WINNER</span></div>
+                {% endif %}
+            </div>
+
+            <!-- Score / VS -->
+            <div class="col-2 col-md-2 text-center">
+                {% if match.status == 'COMPLETED' %}
+                    <div class="metric-val text-white fs-1">{{ match.team1_score }} - {{ match.team2_score }}</div>
+                {% else %}
+                    <div class="font-mono fw-bold fs-4 text-danger">VS</div>
+                {% endif %}
+            </div>
+
+            <!-- Team 2 -->
+            <div class="col-5 col-md-4 text-start">
+                <img src="{{ match.team2.logo_url or 'https://api.dicebear.com/7.x/identicon/svg?seed=' ~ match.team2.tag }}" alt="" width="68" height="68" class="rounded-3 border border-secondary border-opacity-25 mb-2">
+                <h4 class="fw-bold text-white mb-1">{{ match.team2.name }}</h4>
+                <span class="tag-pill">[{{ match.team2.tag }}]</span>
+                {% if match.status == 'COMPLETED' and match.winner_id == match.team2.id %}
+                    <div class="mt-2"><span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-25 font-mono" style="font-size: 0.72rem;"><i class="bi bi-check-circle me-1"></i> WINNER</span></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Private Room Credentials Box -->
+    <div class="room-credentials-box mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <span class="eyebrow-label text-primary mb-1 d-block">CUSTOM LOBBY CREDENTIALS</span>
+                <h5 class="fw-bold text-white mb-1">Mobile Legends In-Game Room</h5>
+                <p class="text-secondary small mb-0">Use these room credentials to join the private custom match.</p>
+            </div>
+            <div class="d-flex gap-3">
+                <div class="p-2.5 rounded-3 card-inner-box text-center" style="min-width: 140px;">
+                    <div class="eyebrow-label" style="font-size: 0.65rem;">ROOM ID</div>
+                    <div class="fw-bold text-white font-mono fs-5 my-1">{{ match.match_room_id or 'UPTM-AUTO' }}</div>
+                    <button type="button" class="btn btn-sm btn-link text-info p-0 small text-decoration-none font-mono" style="font-size: 0.72rem;" data-copy="{{ match.match_room_id }}">
+                        <i class="bi bi-copy me-1"></i> Copy
+                    </button>
+                </div>
+                <div class="p-2.5 rounded-3 card-inner-box text-center" style="min-width: 140px;">
+                    <div class="eyebrow-label" style="font-size: 0.65rem;">PASSWORD</div>
+                    <div class="fw-bold text-warning font-mono fs-5 my-1">{{ match.match_room_password or '123456' }}</div>
+                    <button type="button" class="btn btn-sm btn-link text-info p-0 small text-decoration-none font-mono" style="font-size: 0.72rem;" data-copy="{{ match.match_room_password }}">
+                        <i class="bi bi-copy me-1"></i> Copy
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Score Reporting & Confirmation Form -->
+    <div class="card-custom p-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="fw-bold text-white mb-0">Result Reporting</h5>
+            <span class="eyebrow-label">OFFICIAL RECORD</span>
+        </div>
+
+        {% if match.status == 'COMPLETED' %}
+            <div class="alert alert-success border-0 d-flex align-items-center gap-2 mb-0" style="background-color: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3);">
+                <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+                <div class="small">
+                    <strong>Match Completed & Verified.</strong> 
+                    Final score: {{ match.team1.name }} ({{ match.team1_score }}) - ({{ match.team2_score }}) {{ match.team2.name }}.
+                    Winner: <strong>{{ match.winner.name if match.winner else 'Draw' }}</strong>.
+                </div>
+            </div>
+        {% elif is_participant %}
+            <form method="POST" action="{{ url_for('scrims.report_result', match_id=match.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label small text-secondary">{{ match.team1.name }} Score</label>
+                        <input type="number" name="team1_score" min="0" max="10" value="0" class="form-control form-control-custom font-mono" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small text-secondary">{{ match.team2.name }} Score</label>
+                        <input type="number" name="team2_score" min="0" max="10" value="0" class="form-control form-control-custom font-mono" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small text-secondary">Winner Confirmation</label>
+                        <select name="winner_id" class="form-select form-select-custom">
+                            <option value="{{ match.team1.id }}">{{ match.team1.name }} (Winner)</option>
+                            <option value="{{ match.team2.id }}">{{ match.team2.name }} (Winner)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small text-secondary">Match Screenshot URL (Optional)</label>
+                    <input type="url" name="screenshot_url" class="form-control form-control-custom font-mono" placeholder="https://...">
+                </div>
+
+                <button type="submit" class="btn btn-uptm-blue py-2 px-4">
+                    Submit Match Result
+                </button>
+            </form>
+        {% else %}
+            <p class="text-secondary small mb-0">Only participating roster captains or system administrators can submit results for this match.</p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

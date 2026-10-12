@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Scrim Lobby — UPTM Esports{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Header & Action -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <div class="eyebrow-label text-primary mb-1">MATCHMAKING</div>
+            <h3 class="fw-bold text-white mb-1">MLBB Scrim Lobby</h3>
+            <p class="text-secondary small mb-0">Organize competitive scrimmages between verified campus squads.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('scrims.create') }}" class="btn btn-uptm-blue">
+                <i class="bi bi-plus-lg me-1"></i> Post Scrim Request
+            </a>
+        </div>
+    </div>
+
+    <!-- Status Tabs & Filter -->
+    <div class="card-custom p-3 mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <ul class="nav nav-pills gap-2" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link {% if status_tab == 'OPEN' %}active btn-uptm-blue text-white{% endif %}" href="{{ url_for('scrims.index', tab='OPEN', tier=tier_filter) }}">
+                        <i class="bi bi-broadcast me-1 opacity-75"></i> Open Challenges
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if status_tab == 'SCHEDULED' %}active btn-uptm-blue text-white{% endif %}" href="{{ url_for('scrims.index', tab='SCHEDULED', tier=tier_filter) }}">
+                        <i class="bi bi-calendar-check me-1 opacity-75"></i> Scheduled Matches
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Rank Filter -->
+            <form method="GET" action="{{ url_for('scrims.index') }}" class="d-flex align-items-center gap-2">
+                <input type="hidden" name="tab" value="{{ status_tab }}">
+                <label class="eyebrow-label text-nowrap">Filter Rank:</label>
+                <select name="tier" class="form-select form-select-custom form-select-sm font-mono" onchange="this.form.submit()" style="font-size: 0.78rem;">
+                    <option value="">All Tiers</option>
+                    <option value="EPIC" {% if tier_filter == 'EPIC' %}selected{% endif %}>Epic</option>
+                    <option value="LEGEND" {% if tier_filter == 'LEGEND' %}selected{% endif %}>Legend</option>
+                    <option value="MYTHIC" {% if tier_filter == 'MYTHIC' %}selected{% endif %}>Mythic</option>
+                    <option value="MYTHICAL_GLORY" {% if tier_filter == 'MYTHICAL_GLORY' %}selected{% endif %}>Mythical Glory</option>
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <!-- Content: Open Challenges -->
+    {% if status_tab == 'OPEN' %}
+        <div class="row g-4">
+            {% for req in requests %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card-custom p-4 h-100 hover-glow d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <img src="{{ req.team.logo_url or 'https://api.dicebear.com/7.x/identicon/svg?seed=' ~ req.team.tag }}" alt="{{ req.team.name }}" width="44" height="44" class="rounded">
+                                <div>
+                                    <h5 class="fw-bold text-white mb-0">{{ req.team.name }}</h5>
+                                    <span class="tag-pill">[{{ req.team.tag }}]</span>
+                                    <span class="badge bg-secondary bg-opacity-20 text-secondary border border-secondary border-opacity-25 font-mono ms-1" style="font-size: 0.68rem;">{{ req.format }}</span>
+                                </div>
+                            </div>
+
+                            <div class="p-2.5 rounded-3 card-inner-box mb-3 font-mono" style="font-size: 0.78rem;">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-secondary">Target Ranks:</span>
+                                    <span class="text-info fw-semibold">{{ req.rank_tier_min }} - {{ req.rank_tier_max }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-secondary">Requested Time:</span>
+                                    <span class="text-white">{{ req.preferred_datetime | format_datetime }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-secondary">Posted By:</span>
+                                    <span class="text-secondary">{{ req.requested_by.display_name }}</span>
+                                </div>
+                            </div>
+
+                            {% if req.notes %}
+                                <p class="text-secondary small fst-italic mb-3">
+                                    "{{ req.notes }}"
+                                </p>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            {% if current_user.is_authenticated and current_user.primary_team %}
+                                {% if current_user.primary_team.id == req.team_id %}
+                                    <span class="badge bg-secondary bg-opacity-20 text-secondary border border-secondary border-opacity-25 w-100 py-2 font-mono">Your Team's Request</span>
+                                {% else %}
+                                    <form method="POST" action="{{ url_for('scrims.accept', request_id=req.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-uptm-red w-100 py-2">
+                                            Accept Challenge
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            {% else %}
+                                <a href="{{ url_for('auth.login') }}" class="btn btn-sm btn-outline-custom w-100 font-mono" style="font-size: 0.78rem;">
+                                    Sign In to Accept
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-controller text-secondary fs-2 mb-2 d-block opacity-50"></i>
+                    <h5 class="text-white">No Open Challenges</h5>
+                    <p class="text-secondary small">No teams are currently waiting in the lobby. Post a challenge to find an opponent.</p>
+                    <a href="{{ url_for('scrims.create') }}" class="btn btn-uptm-blue">Post Scrim Request</a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Scheduled Matches Tab -->
+        <div class="row g-4">
+            {% for match in matches %}
+                <div class="col-md-6">
+                    <div class="card-custom p-4 h-100 hover-glow">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-secondary small font-mono" style="font-size: 0.75rem;"><i class="bi bi-calendar-event me-1"></i> {{ match.scheduled_at | format_datetime }}</span>
+                            {% if match.status == 'COMPLETED' %}
+                                <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-25 font-mono" style="font-size: 0.65rem;">COMPLETED</span>
+                            {% else %}
+                                <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-25 font-mono" style="font-size: 0.65rem;">{{ match.status }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center p-3 rounded-3 card-inner-box mb-3">
+                            <div class="text-center" style="width: 40%;">
+                                <div class="fw-semibold text-white fs-6 mb-1">{{ match.team1.name }}</div>
+                                <span class="tag-pill">[{{ match.team1.tag }}]</span>
+                            </div>
+                            <div class="text-center font-mono fw-bold fs-5 text-secondary" style="width: 20%;">
+                                {% if match.status == 'COMPLETED' %}
+                                    <span class="text-white">{{ match.team1_score }} - {{ match.team2_score }}</span>
+                                {% else %}
+                                    <span class="text-danger" style="font-size: 0.85rem;">VS</span>
+                                {% endif %}
+                            </div>
+                            <div class="text-center" style="width: 40%;">
+                                <div class="fw-semibold text-white fs-6 mb-1">{{ match.team2.name }}</div>
+                                <span class="tag-pill">[{{ match.team2.tag }}]</span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="font-mono text-secondary small" style="font-size: 0.75rem;">Room: <strong class="text-white">{{ match.match_room_id }}</strong></span>
+                            <a href="{{ url_for('scrims.match_detail', match_id=match.id) }}" class="btn btn-sm btn-outline-custom" style="font-size: 0.78rem;">
+                                Enter Room <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12 text-center py-5">
+                    <p class="text-secondary small">No scheduled or completed matches yet.</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In — UPTM Esports Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card-custom p-4 p-sm-5">
+
+                <!-- Brand Header -->
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex p-2.5 rounded-3 mb-3 border border-secondary border-opacity-25" style="background-color: var(--bg-card-inner);">
+                        <img src="{{ url_for('static', filename='img/uptm-icon.png') }}" alt="UPTM" width="36" height="36">
+                    </div>
+                    <h4 class="fw-bold text-white mb-1">
+                        <span style="color: #2563eb;">UPTM</span> Esports Portal
+                    </h4>
+                    <p class="text-secondary small">Universiti Poly-Tech Malaysia &middot; Sign In</p>
+                </div>
+
+                <!-- Tab Selector -->
+                <ul class="nav nav-pills nav-fill p-1 rounded-3 mb-4 card-inner-box" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if active_tab != 'ADMIN' %}active btn-uptm-blue text-white{% else %}text-secondary{% endif %}" id="student-tab" data-bs-toggle="pill" data-bs-target="#tab-student" type="button" role="tab" style="font-size: 0.82rem;">
+                            <i class="bi bi-mortarboard me-1"></i> Student SSO
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if active_tab == 'ADMIN' %}active btn-uptm-red text-white{% else %}text-secondary{% endif %}" id="admin-tab" data-bs-toggle="pill" data-bs-target="#tab-admin" type="button" role="tab" style="font-size: 0.82rem;">
+                            <i class="bi bi-shield-lock me-1"></i> Admin Portal
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <!-- Tab 1: Student Login -->
+                    <div class="tab-pane fade {% if active_tab != 'ADMIN' %}show active{% endif %}" id="tab-student" role="tabpanel">
+                        <!-- Institutional Domain Notice -->
+                        <div class="p-2.5 rounded-3 mb-4 card-inner-box d-flex gap-2 align-items-center" style="font-size: 0.78rem;">
+                            <i class="bi bi-shield-check text-primary fs-6"></i>
+                            <div class="text-secondary">
+                                Institutional Access: <code class="text-info font-mono">@student.uptm.edu.my</code>
+                            </div>
+                        </div>
+
+                        <form method="POST" action="{{ url_for('auth.login') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="form_type" value="STUDENT">
+
+                            <div class="mb-3">
+                                <label class="form-label small text-secondary">Student Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-transparent border-secondary border-opacity-25 text-secondary"><i class="bi bi-envelope"></i></span>
+                                    <input type="email" name="email" class="form-control form-control-custom" placeholder="e.g. captain1@student.uptm.edu.my" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label small text-secondary">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-transparent border-secondary border-opacity-25 text-secondary"><i class="bi bi-lock"></i></span>
+                                    <input type="password" name="password" class="form-control form-control-custom" placeholder="Enter password" required>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-uptm-blue w-100 py-2.5">
+                                Sign In as Student
+                            </button>
+                        </form>
+
+                        <div class="text-center mt-3 small">
+                            <span class="text-secondary">Don't have an account?</span>
+                            <a href="{{ url_for('auth.register') }}" class="text-info text-decoration-none ms-1">Register</a>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Admin Portal -->
+                    <div class="tab-pane fade {% if active_tab == 'ADMIN' %}show active{% endif %}" id="tab-admin" role="tabpanel">
+                        <div class="p-2.5 rounded-3 mb-4 border border-danger border-opacity-25 d-flex gap-2 align-items-center" style="background-color: rgba(225, 29, 72, 0.08); font-size: 0.78rem;">
+                            <i class="bi bi-key text-danger fs-6"></i>
+                            <div class="text-secondary">
+                                Restricted Administrator Access &middot; SHA-256 Audit Logged
+                            </div>
+                        </div>
+
+                        <form method="POST" action="{{ url_for('auth.login') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="form_type" value="ADMIN">
+
+                            <div class="mb-3">
+                                <label class="form-label small text-secondary">Admin Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-transparent border-secondary border-opacity-25 text-secondary"><i class="bi bi-person-badge"></i></span>
+                                    <input type="email" name="email" class="form-control form-control-custom font-mono" value="admin@uptm.edu.my" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label small text-secondary">Admin Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-transparent border-secondary border-opacity-25 text-secondary"><i class="bi bi-lock-fill"></i></span>
+                                    <input type="password" name="password" class="form-control form-control-custom" placeholder="Enter admin password" required>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-uptm-red w-100 py-2.5">
+                                Authenticate as Admin
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Minimalist Quick Switcher -->
+                <div class="mt-4 pt-4 border-top border-secondary border-opacity-25 text-center">
+                    <span class="eyebrow-label d-block mb-2">Evaluation Personas</span>
+                    <div class="d-flex flex-wrap justify-content-center gap-2">
+                        <a href="{{ url_for('auth.demo_login', role='ADMIN') }}" class="btn btn-sm btn-outline-custom font-mono" style="font-size: 0.72rem; padding: 0.25rem 0.65rem;">
+                            Admin
+                        </a>
+                        <a href="{{ url_for('auth.demo_login', role='CAPTAIN') }}" class="btn btn-sm btn-outline-custom font-mono" style="font-size: 0.72rem; padding: 0.25rem 0.65rem;">
+                            Captain Faiz
+                        </a>
+                        <a href="{{ url_for('auth.demo_login', role='PLAYER') }}" class="btn btn-sm btn-outline-custom font-mono" style="font-size: 0.72rem; padding: 0.25rem 0.65rem;">
+                            Player Haziq
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

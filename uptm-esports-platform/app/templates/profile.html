@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Student Gamer Profile — UPTM Esports{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9">
+            <div class="card-custom p-4 p-sm-5">
+
+                <!-- Header Block -->
+                <div class="d-flex align-items-center gap-3.5 mb-4 border-bottom border-secondary border-opacity-15 pb-4">
+                    <img src="{{ current_user.avatar_url or 'https://api.dicebear.com/7.x/bottts/svg?seed=' ~ current_user.email }}" alt="" width="68" height="68" class="rounded-4 border border-secondary border-opacity-25 bg-dark">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h3 class="h4 fw-bold text-white mb-0" style="letter-spacing: -0.02em;">{{ current_user.display_name }}</h3>
+                            <span class="badge {{ current_user.rank_tier | rank_badge_class }}">{{ current_user.rank_tier }}</span>
+                        </div>
+                        <div class="text-secondary small font-mono d-flex align-items-center gap-1.5">
+                            <i class="bi bi-shield-check text-success"></i> {{ current_user.email }}
+                        </div>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ url_for('profile.index') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <!-- Account Details -->
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <span class="text-uppercase small fw-bold text-secondary font-mono" style="letter-spacing: 0.05em; font-size: 0.72rem;">Gamer Persona</span>
+                        <span class="badge bg-secondary-subtle text-secondary font-mono" style="font-size: 0.7rem;">ROLE: {{ current_user.role }}</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Display Name <span class="text-danger">*</span></label>
+                        <input type="text" name="display_name" class="form-control form-control-custom" value="{{ current_user.display_name }}" required>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small text-secondary">In-Game Name (MLBB IGN)</label>
+                            <input type="text" name="mlbb_ign" class="form-control form-control-custom font-mono" value="{{ current_user.mlbb_ign or '' }}" placeholder="e.g. Faiz_Carry">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-secondary">MLBB Player ID</label>
+                            <input type="text" name="mlbb_id" class="form-control form-control-custom font-mono" value="{{ current_user.mlbb_id or '' }}" placeholder="e.g. 123456789">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small text-secondary">Rank Tier</label>
+                            <select name="rank_tier" class="form-select form-select-custom">
+                                {% for val, label in rank_tiers %}
+                                    <option value="{{ val }}" {% if current_user.rank_tier == val %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-secondary">Avatar URL</label>
+                            <input type="url" name="avatar_url" class="form-control form-control-custom" value="{{ current_user.avatar_url or '' }}" placeholder="https://...">
+                        </div>
+                    </div>
+
+                    <!-- Sensitive PII Section -->
+                    <div class="card-inner-box p-3.5 mb-4">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-lock text-success"></i>
+                                <span class="small fw-semibold text-white">Institutional Data (AES-256 Encrypted)</span>
+                            </div>
+                            <span class="badge bg-success-subtle text-success font-mono" style="font-size: 0.65rem;">GCM SECURED</span>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small text-secondary">Student ID</label>
+                                <input type="text" name="student_id" class="form-control form-control-custom font-mono" value="{{ current_user.student_id or '' }}" placeholder="e.g. SW01081234">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-secondary">Phone Number</label>
+                                <input type="tel" name="phone" class="form-control form-control-custom font-mono" value="{{ current_user.phone or '' }}" placeholder="e.g. +60112345678">
+                            </div>
+                        </div>
+                        <div class="text-secondary mt-2.5" style="font-size: 0.72rem; line-height: 1.4;">
+                            Encrypted at rest according to PDPA standards. Accessible strictly to campus tournament officials for eligibility verification.
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-uptm-blue w-100 py-2.5">
+                        <i class="bi bi-check2 me-1"></i> Save Profile Details
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

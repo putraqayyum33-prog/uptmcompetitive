@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}UPTM Esports — Competitive Gaming Platform{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="py-5 text-center position-relative overflow-hidden">
+    <div class="container py-lg-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+
+                <!-- Campus Pill -->
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill mb-4 border border-secondary border-opacity-25" style="background-color: rgba(37, 99, 235, 0.08);">
+                    <img src="{{ url_for('static', filename='img/uptm-icon.png') }}" alt="UPTM" width="16" height="16">
+                    <span class="font-mono text-secondary" style="font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase;">Universiti Poly-Tech Malaysia &middot; Official Platform</span>
+                </div>
+
+                <!-- Main Headline -->
+                <h1 class="display-3 fw-bold text-white mb-3" style="letter-spacing: -0.035em; line-height: 1.15;">
+                    Campus Esports.<br>
+                    <span style="background: linear-gradient(135deg, #93c5fd 0%, #3b82f6 50%, #f43f5e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Competitive & Verified.</span>
+                </h1>
+
+                <p class="lead text-secondary mx-auto mb-4" style="max-width: 620px; font-size: 1.05rem; line-height: 1.6;">
+                    Organize Mobile Legends scrimmages, track verified rosters, and compete in official Universiti Poly-Tech Malaysia tournaments.
+                </p>
+
+                <!-- Action Buttons -->
+                <div class="d-flex flex-wrap justify-content-center gap-3 mb-5">
+                    <a href="{{ url_for('scrims.index') }}" class="btn btn-uptm-blue px-4 py-2.5">
+                        <i class="bi bi-controller me-2 opacity-75"></i> Find Scrims
+                    </a>
+                    <a href="{{ url_for('tournaments.index') }}" class="btn btn-outline-custom px-4 py-2.5">
+                        <i class="bi bi-trophy me-2 opacity-75"></i> Tournaments
+                    </a>
+                    <a href="{{ url_for('leaderboard.index') }}" class="btn btn-outline-custom px-4 py-2.5">
+                        <i class="bi bi-bar-chart-line me-2 opacity-75"></i> Leaderboard
+                    </a>
+                </div>
+
+                <!-- Metrics Grid -->
+                <div class="row g-3 max-w-4xl mx-auto pt-2">
+                    <div class="col-6 col-md-3">
+                        <div class="card-custom p-3 text-center">
+                            <div class="metric-val fs-2 text-white mb-0">{{ stats.gamers }}+</div>
+                            <div class="eyebrow-label mt-1">UPTM Gamers</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card-custom p-3 text-center">
+                            <div class="metric-val fs-2 text-primary mb-0">{{ stats.teams }}</div>
+                            <div class="eyebrow-label mt-1">Active Rosters</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card-custom p-3 text-center">
+                            <div class="metric-val fs-2 text-danger mb-0">{{ stats.scrims }}+</div>
+                            <div class="eyebrow-label mt-1">Matches Played</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card-custom p-3 text-center">
+                            <div class="metric-val fs-2 text-success mb-0">100%</div>
+                            <div class="eyebrow-label mt-1">Campus Gated</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Grid -->
+<section class="py-5 border-top border-secondary border-opacity-25" style="background-color: rgba(9, 12, 18, 0.4);">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <span class="eyebrow-label text-primary">PLATFORM CAPABILITIES</span>
+            <h2 class="fw-bold text-white mt-2">Built for Competitive Campus Play</h2>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card-custom p-4 h-100 hover-glow">
+                    <div class="d-inline-flex p-2.5 rounded-3 mb-3" style="background-color: rgba(37, 99, 235, 0.12); color: #3b82f6;">
+                        <i class="bi bi-controller fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-white mb-2">Scrim Matchmaking</h5>
+                    <p class="text-secondary small mb-0" style="line-height: 1.6;">
+                        Post challenges filtered by MLBB division. Automated private room generation on challenge acceptance with real-time status tracking.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card-custom p-4 h-100 hover-glow">
+                    <div class="d-inline-flex p-2.5 rounded-3 mb-3" style="background-color: rgba(225, 29, 72, 0.12); color: #f43f5e;">
+                        <i class="bi bi-trophy fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-white mb-2">Automated Brackets</h5>
+                    <p class="text-secondary small mb-0" style="line-height: 1.6;">
+                        Single-elimination brackets with automatic seed assignment, match progression, captain score submissions, and verified records.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card-custom p-4 h-100 hover-glow">
+                    <div class="d-inline-flex p-2.5 rounded-3 mb-3" style="background-color: rgba(16, 185, 129, 0.12); color: #34d399;">
+                        <i class="bi bi-shield-check fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-white mb-2">Institutional Security</h5>
+                    <p class="text-secondary small mb-0" style="line-height: 1.6;">
+                        Exclusive authentication restricted to <code>@student.uptm.edu.my</code>. Student PII encrypted at rest via AES-256 with cryptographic audit trails.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

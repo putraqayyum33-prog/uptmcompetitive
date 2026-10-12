@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Esports Leaderboards — UPTM Esports{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <div class="eyebrow-label mb-2">CAMPUS STANDINGS</div>
+        <h2 class="display-6 fw-bold text-white mb-2">Leaderboard & Rankings</h2>
+        <p class="text-secondary small mx-auto" style="max-width: 540px;">
+            Verified campus standings based on competitive scrimmage victories and player division ratings.
+        </p>
+    </div>
+
+    <!-- Minimalist Podium for Top 3 Rosters -->
+    {% if teams|length >= 2 %}
+        <div class="row justify-content-center align-items-end g-3 mb-5 text-center">
+            <!-- 2nd Place -->
+            {% if teams|length >= 2 %}
+                <div class="col-4 col-md-3">
+                    <div class="podium-card podium-card-2">
+                        <span class="podium-pill podium-pill-2">02 &middot; Finalist</span>
+                        <div class="mb-2">
+                            <img src="{{ teams[1].logo_url or 'https://api.dicebear.com/7.x/identicon/svg?seed=' ~ teams[1].tag }}" alt="" width="52" height="52" class="rounded-3 border border-secondary border-opacity-25">
+                        </div>
+                        <h6 class="fw-bold text-white mb-1 text-truncate">{{ teams[1].name }}</h6>
+                        <span class="tag-pill">[{{ teams[1].tag }}]</span>
+                        <div class="font-mono text-secondary small mt-3" style="font-size: 0.78rem;">
+                            <span class="text-white fw-semibold">{{ teams[1].scrim_wins }}W</span> &middot; {{ teams[1].win_rate }}%
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- 1st Place (Champion) -->
+            <div class="col-4 col-md-3">
+                <div class="podium-card podium-card-1">
+                    <span class="podium-pill podium-pill-1"><i class="bi bi-trophy-fill me-1"></i> 01 &middot; Champion</span>
+                    <div class="mb-2">
+                        <img src="{{ teams[0].logo_url or 'https://api.dicebear.com/7.x/identicon/svg?seed=' ~ teams[0].tag }}" alt="" width="68" height="68" class="rounded-3 border border-warning border-opacity-50">
+                    </div>
+                    <h5 class="fw-bold text-white mb-1 text-truncate">{{ teams[0].name }}</h5>
+                    <span class="tag-pill" style="border-color: rgba(245, 158, 11, 0.4); color: #fbbf24; background: rgba(245, 158, 11, 0.1);">[{{ teams[0].tag }}]</span>
+                    <div class="font-mono text-warning small fw-bold mt-3" style="font-size: 0.85rem;">
+                        <span class="text-white">{{ teams[0].scrim_wins }}W</span> &middot; {{ teams[0].win_rate }}% WR
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3rd Place -->
+            {% if teams|length >= 3 %}
+                <div class="col-4 col-md-3">
+                    <div class="podium-card podium-card-3">
+                        <span class="podium-pill podium-pill-3">03 &middot; 3rd Place</span>
+                        <div class="mb-2">
+                            <img src="{{ teams[2].logo_url or 'https://api.dicebear.com/7.x/identicon/svg?seed=' ~ teams[2].tag }}" alt="" width="52" height="52" class="rounded-3 border border-secondary border-opacity-25">
+                        </div>
+                        <h6 class="fw-bold text-white mb-1 text-truncate">{{ teams[2].name }}</h6>
+                        <span class="tag-pill">[{{ teams[2].tag }}]</span>
+                        <div class="font-mono text-secondary small mt-3" style="font-size: 0.78rem;">
+                            <span class="text-white fw-semibold">{{ teams[2].scrim_wins }}W</span> &middot; {{ teams[2].win_rate }}%
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="row g-4">
+        <!-- Team Rankings Table -->
+        <div class="col-lg-7">
+            <div class="card-custom p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="fw-bold text-white mb-0">Roster Standings</h5>
+                    <span class="eyebrow-label">OFFICIAL LADDER</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-custom mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 45px;">#</th>
+                                <th>Squad</th>
+                                <th>Captain</th>
+                                <th class="text-end">Matches</th>
+                                <th class="text-end">Wins</th>
+                                <th class="text-end">Win Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for team in teams %}
+                                <tr>
+                                    <td class="font-mono fw-bold {% if loop.index == 1 %}text-warning{% elif loop.index == 2 %}text-light{% elif loop.index == 3 %}text-secondary{% else %}text-muted{% endif %}" style="font-size: 0.8rem;">
+                                        {{ "%02d"|format(loop.index) }}
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2.5">
+                                            <img src="{{ team.logo_url or 'https://api.dicebear.com/7.x/identicon/svg?seed=' ~ team.tag }}" alt="" width="26" height="26" class="rounded">
+                                            <div>
+                                                <a href="{{ url_for('teams.detail', team_id=team.id) }}" class="text-white fw-semibold text-decoration-none">
+                                                    {{ team.name }}
+                                                </a>
+                                                <span class="tag-pill ms-1">[{{ team.tag }}]</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-secondary small">{{ team.captain.display_name }}</td>
+                                    <td class="font-mono text-end text-secondary small">{{ team.total_scrims_played }}</td>
+                                    <td class="font-mono text-end text-white fw-semibold small">{{ team.scrim_wins }}</td>
+                                    <td class="font-mono text-end">
+                                        <span class="badge bg-secondary bg-opacity-25 text-info border border-secondary border-opacity-25" style="font-size: 0.72rem;">{{ team.win_rate }}%</span>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr><td colspan="6" class="text-center text-secondary py-4">No team records found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Individual Players -->
+        <div class="col-lg-5">
+            <div class="card-custom p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="fw-bold text-white mb-0">Player Ranks</h5>
+                    <span class="eyebrow-label">SOLO TIERS</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-custom mb-0">
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>IGN</th>
+                                <th class="text-end">Rank Tier</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in players %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <img src="{{ p.avatar_url or 'https://api.dicebear.com/7.x/bottts/svg?seed=' ~ p.email }}" alt="" width="26" height="26" class="rounded-circle">
+                                            <span class="text-white small fw-medium">{{ p.display_name }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="font-mono text-secondary small">{{ p.mlbb_ign or '—' }}</td>
+                                    <td class="text-end">
+                                        <span class="badge-rank {{ p.rank_tier | rank_badge_class }}">{{ p.rank_tier }}</span>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr><td colspan="3" class="text-center text-secondary py-4">No player records found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
